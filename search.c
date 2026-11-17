@@ -96,8 +96,87 @@ int search_database(char *word, mainnode_t *arr[])
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-int update_database()
+int update_database(Slist *head, mainnode_t *arr[])
 {
+    char fname[30], word[30];
+    int index, file_count, word_count;
+    printf("Enter the backup file: ");
+    scanf("%s", fname);
+
+    if(valid_backupfile(fname) == FAILURE)
+    {
+        printf("ERROR...\n");
+        return FAILURE;
+    }
+
+    FILE *fptr = fopen(fname, "r");
+    if(fptr == NULL)
+    {
+        printf("File failed\n");
+        return FAILURE;
+    }
+
+    while(fscanf(fptr, "#%d;%[^;];%d;", &index, word, &file_count) == 3)
+    {
+        mainnode_t *M_newNode = malloc(sizeof(mainnode_t));
+        if(M_newNode == NULL)
+        {
+            printf("Memory allocation failed....\n");
+            return FAILURE;
+        }
+
+        strcpy(M_newNode -> word, word);
+        M_newNode -> file_count = file_count;
+        M_newNode -> sublink = NULL;
+        M_newNode -> link = NULL;
+
+        if(arr[index] == NULL)
+        {
+            arr[index] = M_newNode;
+        }
+        else
+        {
+            mainnode_t *M_temp = arr[index];
+            while(M_temp -> link != NULL)
+            {
+                M_temp = M_temp -> link;
+            }
+            M_temp -> link = M_newNode;
+        }
+
+        for(int i = 0; i < file_count; i++)
+        {
+            if(fscanf(fptr, "%[^;]%d", fname, &word_count) != 2)
+            {
+                return FAILURE;
+            }
+            subnode_t *S_newNode = malloc(sizeof(subnode_t));
+            if(S_newNode == NULL)
+            {
+                printf("Memory allocation failed\n");
+                return FAILURE;
+            } 
+
+            strcpy(S_newNode -> filename, fname);
+            S_newNode -> word_count = word_count;
+            S_newNode -> link = NULL;
+
+            if(M_newNode -> sublink == NULL)
+            {
+                M_newNode -> sublink = S_newNode;
+            }
+            else
+            {
+                subnode_t *S_temp = M_newNode -> sublink;
+                while(S_temp -> link != NULL)
+                {
+                    S_temp = S_temp -> link;
+                }
+                S_temp -> link = S_newNode;
+            }
+        }
+        fscanf(fptr, "#");
+    }
     return SUCCESS;
 }
 

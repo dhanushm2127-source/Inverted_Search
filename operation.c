@@ -194,3 +194,47 @@ int insert_word(char *fname, char *word, mainnode_t *arr[])
     M_prev -> link = M_newNode;
     return SUCCESS;
 }
+
+int valid_backupfile(char *filename)
+{
+    //File extension
+    char *dot = strrchr(filename, '.');
+    if(dot == NULL || strcmp(dot, ".txt") != 0)
+    {
+        printf("ERROR...Extension must be '.txt'\n");
+        return FAILURE;
+    }
+
+    //File present or not
+    FILE *fptr = fopen(filename, "r");
+    if(fptr == NULL)
+    {
+        printf("File does not exist\n");
+        return FAILURE;
+    }
+
+    //Check the content present or not
+    if(fgetc(fptr) == EOF)
+    {
+        printf("File is empty\n");
+        fclose(fptr);
+        return FAILURE;
+    }
+    rewind(fptr);
+
+    char start, end;
+    start = fgetc(fptr);
+    fseek(fptr, -1, SEEK_END);
+    end = fgetc(fptr);
+
+    if(start != '#' && end != '#')
+    {
+        printf("Start = %c and End = %c\n", start, end);
+        printf("ERROR....Invalid Backup file contents\n");
+        fclose(fptr);
+        return FAILURE;
+
+    }
+    fclose(fptr);
+    return SUCCESS;
+}

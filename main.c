@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
     int option;
     mainnode_t *arr[27] = {0};
     char word[30];
+    int create_flag = 0, updated_flag = 0;
     printf("1. Create database\n2. Display database\n3. Search database\n4. Update database\n5. Save database\n6. Exit\n");
     while(1)
     {
@@ -30,7 +31,7 @@ int main(int argc, char *argv[])
         {
             case 1:
                 create_database(head, arr);
-                printf("Created database successfully....\n");
+                printf("Database created successfully....\n");
                 break;
             case 2:
                 display_database(arr);
@@ -41,7 +42,8 @@ int main(int argc, char *argv[])
                 search_database(word, arr);
                 break;
             case 4:
-                update_database();
+                update_database(head, arr);
+                printf("Database updated successfully....\n");
                 break;
             case 5:
                 save_database(arr);
