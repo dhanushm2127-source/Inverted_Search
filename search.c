@@ -104,7 +104,7 @@ int update_database()
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
 int save_database(mainnode_t *arr[])
 {
-    FILE *fptr = fopen("save.csv","w+");
+    FILE *fptr = fopen("save.txt","w+");
     if(fptr == NULL)
     {
         printf("ERROR... Unable to open save.csv\n");

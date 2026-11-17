@@ -1,5 +1,5 @@
-#include<stdio.h>
-#include"search.h"
+#include <stdio.h>
+#include "search.h"
 
 int main(int argc, char *argv[])
 {

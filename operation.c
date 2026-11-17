@@ -83,7 +83,7 @@ void print_list(Slist *head)
 		    head = head -> link;
 	    }
 
-	    printf("NULL\n\n");
+	    printf("NULL\n");
     }
 }
 
