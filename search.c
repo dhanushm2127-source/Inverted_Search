@@ -3,16 +3,16 @@
 #include<ctype.h>
 #include<stdlib.h>
 
-int create_database(Slist *head, mainnode_t *arr[])
+int create_database(File_t *file, Mainnode_t *arr[])
 {
     char word[30];
-    if(head == NULL)
+    if(file == NULL)
     {
         printf("ERROR.... Unable to open faile\n");
         return FAILURE;
     }
 
-    Slist *temp = head;
+    File_t *temp = file;
     while(temp != NULL)
     {
         FILE *fptr = fopen(temp -> fname, "r");
@@ -33,7 +33,7 @@ int create_database(Slist *head, mainnode_t *arr[])
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-int display_database(mainnode_t *arr[])
+int display_database(Mainnode_t *arr[])
 {
     for(int i = 0; i < 27; i++)
     {
@@ -41,11 +41,11 @@ int display_database(mainnode_t *arr[])
         {
             continue;
         }
-        mainnode_t *M_temp = arr[i];
+        Mainnode_t *M_temp = arr[i];
         while(M_temp != NULL)
         {
             printf("%-5d\t%-5s\t%-5d\t", i, M_temp -> word, M_temp -> file_count);
-            subnode_t *S_temp = M_temp -> sublink;
+            Subnode_t *S_temp = M_temp -> sublink;
             while(S_temp != NULL)
             {
                 printf("%-5s\t%-5d\t", S_temp -> filename, S_temp -> word_count);
@@ -59,7 +59,7 @@ int display_database(mainnode_t *arr[])
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-int search_database(char *word, mainnode_t *arr[])
+int search_database(char *word, Mainnode_t *arr[])
 {
     int index;
     if(islower(word[0]))
@@ -75,13 +75,13 @@ int search_database(char *word, mainnode_t *arr[])
         index = 26;
     }
 
-    mainnode_t *M_temp = arr[index];
+    Mainnode_t *M_temp = arr[index];
     while(M_temp != NULL)
     {
         if(strcmp(M_temp -> word, word) == 0)
         {
             printf("\nWord %s is present in %d files\n", word, M_temp -> file_count);
-            subnode_t *S_temp = M_temp -> sublink;
+            Subnode_t *S_temp = M_temp -> sublink;
             while(S_temp != NULL)
             {
                 printf("In %s = %d times\n", S_temp -> filename, S_temp -> word_count);
@@ -96,7 +96,7 @@ int search_database(char *word, mainnode_t *arr[])
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-int update_database(Slist *head, mainnode_t *arr[])
+int update_database(File_t *file, Mainnode_t *arr[])
 {
     char fname[30], word[30];
     int index, file_count, word_count;
@@ -118,7 +118,7 @@ int update_database(Slist *head, mainnode_t *arr[])
 
     while(fscanf(fptr, "#%d;%[^;];%d;", &index, word, &file_count) == 3)
     {
-        mainnode_t *M_newNode = malloc(sizeof(mainnode_t));
+        Mainnode_t *M_newNode = malloc(sizeof(Mainnode_t));
         if(M_newNode == NULL)
         {
             printf("Memory allocation failed....\n");
@@ -136,7 +136,7 @@ int update_database(Slist *head, mainnode_t *arr[])
         }
         else
         {
-            mainnode_t *M_temp = arr[index];
+            Mainnode_t *M_temp = arr[index];
             while(M_temp -> link != NULL)
             {
                 M_temp = M_temp -> link;
@@ -146,11 +146,12 @@ int update_database(Slist *head, mainnode_t *arr[])
 
         for(int i = 0; i < file_count; i++)
         {
-            if(fscanf(fptr, "%[^;]%d", fname, &word_count) != 2)
+            if(fscanf(fptr, "%[^;];%d", fname, &word_count) != 2)
             {
+                printf("ERroro");
                 return FAILURE;
             }
-            subnode_t *S_newNode = malloc(sizeof(subnode_t));
+            Subnode_t *S_newNode = malloc(sizeof(Subnode_t));
             if(S_newNode == NULL)
             {
                 printf("Memory allocation failed\n");
@@ -167,7 +168,7 @@ int update_database(Slist *head, mainnode_t *arr[])
             }
             else
             {
-                subnode_t *S_temp = M_newNode -> sublink;
+                Subnode_t *S_temp = M_newNode -> sublink;
                 while(S_temp -> link != NULL)
                 {
                     S_temp = S_temp -> link;
@@ -177,11 +178,12 @@ int update_database(Slist *head, mainnode_t *arr[])
         }
         fscanf(fptr, "#");
     }
+    printf("Database updated successfully....\n");
     return SUCCESS;
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-int save_database(mainnode_t *arr[])
+int save_database(Mainnode_t *arr[])
 {
     FILE *fptr = fopen("save.txt","w+");
     if(fptr == NULL)
@@ -196,11 +198,11 @@ int save_database(mainnode_t *arr[])
         {
             continue;
         }
-        mainnode_t *M_temp = arr[i];
+        Mainnode_t *M_temp = arr[i];
         while(M_temp != NULL)
         {
             fprintf(fptr,"#%d;%s;%d;", i, M_temp -> word, M_temp -> file_count);
-            subnode_t *S_temp = M_temp -> sublink;
+            Subnode_t *S_temp = M_temp -> sublink;
             while(S_temp != NULL)
             {
                 fprintf(fptr, "%s;%d;", S_temp -> filename, S_temp -> word_count);

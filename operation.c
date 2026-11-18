@@ -1,6 +1,6 @@
 #include "search.h"
-#include<string.h>
-#include<ctype.h>
+#include <string.h>
+#include <ctype.h>
 
 int validate_arg(char *argv[], int index)
 {
@@ -42,9 +42,9 @@ int validate_arg(char *argv[], int index)
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-int insert_at_last(Slist **head, char *file_name)
+int insert_at_last(File_t **file, char *file_name)
 {
-    Slist *newNode = malloc(sizeof(Slist));
+    File_t *newNode = malloc(sizeof(File_t));
     if(newNode == NULL)
     {
         printf("Memory allocation failed\n");
@@ -53,12 +53,12 @@ int insert_at_last(Slist **head, char *file_name)
     
     strcpy(newNode -> fname, file_name);
     newNode -> link = NULL;
-    if(*head == NULL)
+    if(*file == NULL)
     {
-        *head = newNode;
+        *file = newNode;
         return SUCCESS;
     }
-    Slist *temp = *head;
+    File_t *temp = *file;
     while(temp -> link != NULL)
     {
         temp = temp -> link;
@@ -68,19 +68,19 @@ int insert_at_last(Slist **head, char *file_name)
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-void print_list(Slist *head)
+void print_list(File_t *file)
 {
-	if (head == NULL)
+	if (file == NULL)
 	{
 		printf("INFO : List is empty\n");
 	}
     else
     {
-        printf("\nhead -> ");
-	    while (head != NULL)		
+        printf("\nfile -> ");
+	    while (file != NULL)		
 	    {
-		    printf("%s -> ", head -> fname);
-		    head = head -> link;
+		    printf("%s -> ", file -> fname);
+		    file = file -> link;
 	    }
 
 	    printf("NULL\n");
@@ -88,7 +88,7 @@ void print_list(Slist *head)
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-int insert_word(char *fname, char *word, mainnode_t *arr[])
+int insert_word(char *fname, char *word, Mainnode_t *arr[])
 {
     int index;
     if(islower(word[0]))
@@ -107,7 +107,7 @@ int insert_word(char *fname, char *word, mainnode_t *arr[])
     if(arr[index] == NULL)
     {
         //Creating memory for subnode
-        subnode_t *S_newNode = malloc(sizeof(subnode_t));
+        Subnode_t *S_newNode = malloc(sizeof(Subnode_t));
         if(S_newNode == NULL)
         {
             printf("Memory allocation for subnode is failed\n");
@@ -118,7 +118,7 @@ int insert_word(char *fname, char *word, mainnode_t *arr[])
         S_newNode -> link = NULL;
 
         //Creating memory for mainnode
-        mainnode_t *M_newNode = malloc(sizeof(mainnode_t));
+        Mainnode_t *M_newNode = malloc(sizeof(Mainnode_t));
         if(M_newNode == NULL)
         {
             printf("Memory allocation for mainnode is failed\n");
@@ -133,15 +133,15 @@ int insert_word(char *fname, char *word, mainnode_t *arr[])
         return SUCCESS;
     }
             
-    mainnode_t *M_temp = arr[index];
-    mainnode_t *M_prev = NULL;
+    Mainnode_t *M_temp = arr[index];
+    Mainnode_t *M_prev = NULL;
 
     while(M_temp != NULL)
     {
         if(strcmp(M_temp -> word, word) == 0)
         {
-            subnode_t *S_temp = M_temp -> sublink;
-            subnode_t *S_prev = NULL;
+            Subnode_t *S_temp = M_temp -> sublink;
+            Subnode_t *S_prev = NULL;
             while(S_temp != NULL)
             {
                 if(strcmp(S_temp -> filename, fname) == 0)
@@ -152,7 +152,7 @@ int insert_word(char *fname, char *word, mainnode_t *arr[])
                 S_prev = S_temp;
                 S_temp = S_temp -> link;
             }
-            subnode_t *S_newNode = malloc(sizeof(subnode_t));
+            Subnode_t *S_newNode = malloc(sizeof(Subnode_t));
             if(S_newNode == NULL)
             {
                 printf("Memory allocation for subnode is failed\n");
@@ -169,7 +169,7 @@ int insert_word(char *fname, char *word, mainnode_t *arr[])
         M_temp = M_temp -> link;
     }
     //Creating memory for subnode
-    subnode_t *S_newNode = malloc(sizeof(subnode_t));
+    Subnode_t *S_newNode = malloc(sizeof(Subnode_t));
     if(S_newNode == NULL)
     {
         printf("Memory allocation for subnode is failed\n");
@@ -180,7 +180,7 @@ int insert_word(char *fname, char *word, mainnode_t *arr[])
     S_newNode -> link = NULL;
 
     //Creating memory for mainnode
-    mainnode_t *M_newNode = malloc(sizeof(mainnode_t));
+    Mainnode_t *M_newNode = malloc(sizeof(Mainnode_t));
     if(M_newNode == NULL)
     {
         printf("Memory allocation for mainnode is failed\n");
@@ -195,6 +195,7 @@ int insert_word(char *fname, char *word, mainnode_t *arr[])
     return SUCCESS;
 }
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
 int valid_backupfile(char *filename)
 {
     //File extension
@@ -226,8 +227,13 @@ int valid_backupfile(char *filename)
     start = fgetc(fptr);
     fseek(fptr, -1, SEEK_END);
     end = fgetc(fptr);
+    if(end == '\n')
+    {
+        fseek(fptr, -2, SEEK_END);
+        end = fgetc(fptr);
+    }
 
-    if(start != '#' && end != '#')
+    if(start != '#' || end != '#')
     {
         printf("Start = %c and End = %c\n", start, end);
         printf("ERROR....Invalid Backup file contents\n");
