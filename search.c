@@ -8,7 +8,7 @@ int create_database(File_t *file, Mainnode_t *arr[])
     char word[30];
     if(file == NULL)
     {
-        printf("ERROR.... Unable to open faile\n");
+        printf("ERROR... Unable to create database\n");
         return FAILURE;
     }
 
@@ -18,7 +18,7 @@ int create_database(File_t *file, Mainnode_t *arr[])
         FILE *fptr = fopen(temp -> fname, "r");
         if(fptr == NULL)
         {
-            printf("ERROR.... Unable to open %s file\n", temp -> fname);
+            printf("ERROR... Unable to open %s file\n", temp -> fname);
             temp = temp -> link;
             continue;
         }
@@ -29,18 +29,21 @@ int create_database(File_t *file, Mainnode_t *arr[])
         fclose(fptr);
         temp = temp -> link;
     }
+    printf("Database created successfully....\n");
     return SUCCESS;
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
 int display_database(Mainnode_t *arr[])
 {
+    int check = 0;
     for(int i = 0; i < 27; i++)
     {
         if(arr[i] == NULL)
         {
             continue;
         }
+        check = 1;
         Mainnode_t *M_temp = arr[i];
         while(M_temp != NULL)
         {
@@ -54,6 +57,11 @@ int display_database(Mainnode_t *arr[])
             printf("\n");
             M_temp = M_temp -> link;  
         }
+    }
+    if(check == 0)
+    {
+        printf("No database found to display\n");
+        return FAILURE;
     }
     return SUCCESS;
 }
@@ -100,23 +108,24 @@ int update_database(File_t *file, Mainnode_t *arr[])
 {
     char fname[30], word[30];
     int index, file_count, word_count;
+    
     printf("Enter the backup file: ");
     scanf("%s", fname);
 
     if(valid_backupfile(fname) == FAILURE)
     {
-        printf("ERROR...\n");
+        printf("Invalid backup file...Please enter the valid backup file name\n");
         return FAILURE;
     }
 
     FILE *fptr = fopen(fname, "r");
     if(fptr == NULL)
     {
-        printf("File failed\n");
+        fclose(fptr);
         return FAILURE;
     }
 
-    while(fscanf(fptr, "#%d;%[^;];%d;", &index, word, &file_count) == 3)
+    while(fscanf(fptr, " #%d;%[^;];%d;", &index, word, &file_count) == 3)
     {
         Mainnode_t *M_newNode = malloc(sizeof(Mainnode_t));
         if(M_newNode == NULL)
@@ -146,11 +155,11 @@ int update_database(File_t *file, Mainnode_t *arr[])
 
         for(int i = 0; i < file_count; i++)
         {
-            if(fscanf(fptr, "%[^;];%d", fname, &word_count) != 2)
+            if(fscanf(fptr, "%[^;];%d;", fname, &word_count) != 2)
             {
-                printf("ERroro");
-                return FAILURE;
+                break;
             }
+            remove_duplicate_file(&file, fname);
             Subnode_t *S_newNode = malloc(sizeof(Subnode_t));
             if(S_newNode == NULL)
             {
@@ -185,10 +194,21 @@ int update_database(File_t *file, Mainnode_t *arr[])
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
 int save_database(Mainnode_t *arr[])
 {
-    FILE *fptr = fopen("save.txt","w+");
+    int check = 0;
+    char fname[30];
+    printf("Enter the backup file name to save the database : ");
+    scanf("%s", fname);
+
+    char *dot = strrchr(fname, '.');
+    if(dot == NULL || strcmp(dot, ".txt") != 0)
+    {
+        printf("ERROR... File extension must be '.txt'\n");
+        return FAILURE;
+    }
+    FILE *fptr = fopen(fname, "w+");
     if(fptr == NULL)
     {
-        printf("ERROR... Unable to open save.csv\n");
+        printf("ERROR... Unable to open %s file\n", fname);
         return FAILURE;
     }
 
@@ -198,6 +218,7 @@ int save_database(Mainnode_t *arr[])
         {
             continue;
         }
+        check = 1;
         Mainnode_t *M_temp = arr[i];
         while(M_temp != NULL)
         {
@@ -212,6 +233,13 @@ int save_database(Mainnode_t *arr[])
             M_temp = M_temp -> link;  
         }
     }
+    if(check == 0)
+    {
+        fclose(fptr);
+        printf("No database found to save\n");
+        return FAILURE;
+    }
+    fclose(fptr);
     printf("Database saved successfully....\n");
     return SUCCESS;
 }

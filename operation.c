@@ -2,42 +2,58 @@
 #include <string.h>
 #include <ctype.h>
 
-int validate_arg(char *argv[], int index)
+int duplicate_file(char *argv, File_t *file)
 {
-    //File extension
-    char *dot = strrchr(argv[index], '.');
-    if(dot == NULL || strcmp(dot, ".txt") != 0)
+    while(file != NULL)
     {
-        printf("ERROR...Extension must be '.txt'\n");
-        return FAILURE;
+        if(strcmp(file -> fname, argv) == SUCCESS)
+            return SUCCESS;
+        
+        file = file -> link;
     }
+    return FAILURE;
+}
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
 
-    //File present or not
-    FILE *fptr = fopen(argv[index], "r");
-    if(fptr == NULL)
+int validate_arg(char *argv[], File_t **file)
+{
+    for(int i = 1; argv[i] != 0; i++)
     {
-        printf("File does not exist\n");
-        return FAILURE;
-    }
-
-    //Check the content present or not
-    if(fgetc(fptr) == EOF)
-    {
-        printf("File is empty\n");
-        fclose(fptr);
-        return FAILURE;
-    }
-    fclose(fptr);
-
-    //Check duplicate or not
-    for(int i = 1; i < index; i++)
-    {
-        if(strcmp(argv[index], argv[i]) == 0)
+        //File extension
+        char *dot = strrchr(argv[i], '.');
+        if(dot == NULL || strcmp(dot, ".txt") != 0)
         {
-            printf("ERROR... Duplicate file found\n");
-            return FAILURE;
+            printf("ERROR... %s file extension must be '.txt'\n", argv[i]);
+            continue;
         }
+
+        //File present or not
+        FILE *fptr = fopen(argv[i], "r");
+        if(fptr == NULL)
+        {
+            printf("ERROR... %s file does not exist\n", argv[i]);
+            continue;
+        }
+
+        //Check the content present or not
+        if(fgetc(fptr) == EOF)
+        {
+            printf("ERROR... %s file is empty\n", argv[i]);
+            fclose(fptr);
+            continue;
+        }
+        fclose(fptr);
+
+        //Check duplicate or not
+        if(duplicate_file(argv[i], *file) == SUCCESS)
+        {
+            printf("ERROR... Duplicate file found : %s\n", argv[i]);
+            continue;
+        }
+        insert_at_last(file, argv[i]);
     }
+    if(display_file(*file) == FAILURE)
+        return FAILURE;
     return SUCCESS;
 }
 
@@ -68,12 +84,13 @@ int insert_at_last(File_t **file, char *file_name)
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-void print_list(File_t *file)
+int display_file(File_t *file)
 {
 	if (file == NULL)
-	{
+    {
 		printf("INFO : List is empty\n");
-	}
+        return FAILURE;
+    }
     else
     {
         printf("\nfile -> ");
@@ -82,9 +99,9 @@ void print_list(File_t *file)
 		    printf("%s -> ", file -> fname);
 		    file = file -> link;
 	    }
-
 	    printf("NULL\n");
     }
+    return SUCCESS;
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
@@ -164,6 +181,7 @@ int insert_word(char *fname, char *word, Mainnode_t *arr[])
 
             S_prev -> link = S_newNode;
             (M_temp -> file_count)++;
+            return SUCCESS;
         }
         M_prev = M_temp;
         M_temp = M_temp -> link;
@@ -235,7 +253,7 @@ int valid_backupfile(char *filename)
 
     if(start != '#' || end != '#')
     {
-        printf("Start = %c and End = %c\n", start, end);
+        //printf("Start = %c and End = %c\n", start, end);
         printf("ERROR....Invalid Backup file contents\n");
         fclose(fptr);
         return FAILURE;
@@ -243,4 +261,28 @@ int valid_backupfile(char *filename)
     }
     fclose(fptr);
     return SUCCESS;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
+int remove_duplicate_file(File_t **file, char *fname)
+{
+    File_t *temp = *file;
+    File_t *prev = NULL;
+
+    while(temp != NULL)
+    {
+        if(strcmp(temp -> fname, fname) == SUCCESS)
+        {
+            if(prev == NULL)
+                *file = temp -> link;
+            else
+                prev -> link = temp -> link;
+
+            free(temp);
+            return SUCCESS;
+        }
+        prev = temp;
+        temp = temp -> link;
+    }
+    return FAILURE;
 }

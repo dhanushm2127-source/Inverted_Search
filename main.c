@@ -3,24 +3,25 @@
 
 int main(int argc, char *argv[])
 {
-    File_t *file = NULL;
-    for(int i = 1; i < argc; i++)
+    if(argc < 2)
     {
-        if(validate_arg(argv, i) == FAILURE)
-            continue;
-        else
-            insert_at_last(&file, argv[i]);
+        printf("ERROR... No input files provided\n");
+        return FAILURE;
     }
-    print_list(file);
-    //printf("File is opened successfully\n");
-    
+    File_t *file = NULL;
+    if(validate_arg(argv, &file) == FAILURE)
+    {
+        return FAILURE;
+    }
+
     int option;
     Mainnode_t *arr[27] = {0};
     char word[30];
     int create_flag = 0, update_flag = 0;
-    printf("1. Create database\n2. Display database\n3. Search database\n4. Update database\n5. Save database\n6. Exit\n");
+    //printf("1. Create database\n2. Display database\n3. Search database\n4. Update database\n5. Save database\n6. Exit\n");
     while(1)
     {
+        printf("\n1. Create database\n2. Display database\n3. Search database\n4. Update database\n5. Save database\n6. Exit\n");
         printf("\nEnter choice : ");
         scanf("%d", &option);
         switch(option)
@@ -29,7 +30,6 @@ int main(int argc, char *argv[])
                 if(create_flag == 0)
                 {
                     create_database(file, arr);
-                    printf("Database created successfully....\n");
                     create_flag = 1;
                 }
                 else
