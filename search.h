@@ -34,8 +34,8 @@ int insert_at_last(File_t **file, char *filename);
 int display_file(File_t *file);
 int insert_word(char *fname, char *word, Mainnode_t *arr[]);
 int valid_backupfile(char *filename);
-int remove_duplicate_file(File_t **file, char *fname);
 
+int do_operation(File_t *file, Mainnode_t *arr[]);
 int create_database(File_t *head, Mainnode_t *arr[]);
 int display_database(Mainnode_t *arr[]);
 int search_database(char *word, Mainnode_t *arr[]);

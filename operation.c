@@ -93,7 +93,7 @@ int display_file(File_t *file)
     }
     else
     {
-        printf("\nfile -> ");
+        printf("\nHead -> ");
 	    while (file != NULL)		
 	    {
 		    printf("%s -> ", file -> fname);
@@ -261,28 +261,4 @@ int valid_backupfile(char *filename)
     }
     fclose(fptr);
     return SUCCESS;
-}
-
-/*----------------------------------------------------------------------------------------------------------------------------------------*/
-int remove_duplicate_file(File_t **file, char *fname)
-{
-    File_t *temp = *file;
-    File_t *prev = NULL;
-
-    while(temp != NULL)
-    {
-        if(strcmp(temp -> fname, fname) == SUCCESS)
-        {
-            if(prev == NULL)
-                *file = temp -> link;
-            else
-                prev -> link = temp -> link;
-
-            free(temp);
-            return SUCCESS;
-        }
-        prev = temp;
-        temp = temp -> link;
-    }
-    return FAILURE;
 }
