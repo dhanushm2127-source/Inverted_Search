@@ -66,6 +66,7 @@ int do_operation(File_t **file, Mainnode_t *arr[])
     }
 }
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
 int create_database(File_t *file, Mainnode_t *arr[])
 {
     char word[30];

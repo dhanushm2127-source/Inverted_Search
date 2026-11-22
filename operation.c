@@ -14,6 +14,7 @@ int duplicate_file(char *argv, File_t *file)
     return FAILURE;
 }
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
 int is_backupfile(char *argv)
 {
     FILE *fptr = fopen(argv, "r");
@@ -35,8 +36,8 @@ int is_backupfile(char *argv)
     }
     return FAILURE;
 }
-/*----------------------------------------------------------------------------------------------------------------------------------------*/
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
 int validate_arg(char *argv[], File_t **file)
 {
     for(int i = 1; argv[i] != 0; i++)
@@ -293,6 +294,7 @@ int valid_backupfile(char *filename)
     return SUCCESS;
 }
 
+/*----------------------------------------------------------------------------------------------------------------------------------------*/
 int remove_duplicate_file(File_t **file, char *filename)
 {
     File_t *temp = *file;
@@ -317,3 +319,4 @@ int remove_duplicate_file(File_t **file, char *filename)
     }
     return FAILURE;
 }
+
