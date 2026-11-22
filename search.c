@@ -3,7 +3,7 @@
 #include<ctype.h>
 #include<stdlib.h>
 
-int do_operation(File_t *file, Mainnode_t *arr[])
+int do_operation(File_t **file, Mainnode_t *arr[])
 {
     int option;
     char word[30];
@@ -19,7 +19,7 @@ int do_operation(File_t *file, Mainnode_t *arr[])
             case 1:
                 if(create_flag == 0)
                 {    
-                    create_database(file, arr);
+                    create_database(*file, arr);
                     create_flag = 1;    
                 }
                 else
@@ -58,7 +58,7 @@ int do_operation(File_t *file, Mainnode_t *arr[])
                 break;
             case 6:
                 printf("Exiting....\n");
-                return FAILURE;
+                return SUCCESS;
                 break;
             default:
                 printf("Invalid choice....\n");   
@@ -85,9 +85,13 @@ int create_database(File_t *file, Mainnode_t *arr[])
             temp = temp -> link;
             continue;
         }
-        while(fscanf(fptr, "%s", word) != EOF)
+        while(fscanf(fptr, "%s", word) == 1)
         {
-            insert_word(temp -> fname, word, arr);
+            if(insert_word(temp -> fname, word, arr) == FAILURE)
+            {
+                fclose(fptr);
+                return FAILURE;
+            }
         }
         fclose(fptr);
         temp = temp -> link;
@@ -167,7 +171,7 @@ int search_database(char *word, Mainnode_t *arr[])
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
-int update_database(File_t *file, Mainnode_t *arr[])
+int update_database(File_t **file, Mainnode_t *arr[])
 {
     char fname[30], word[30];
     int index, file_count, word_count;
@@ -222,7 +226,7 @@ int update_database(File_t *file, Mainnode_t *arr[])
                 fclose(fptr);
                 return FAILURE;
             }
-            //remove_duplicate_file(&file, fname);
+            remove_duplicate_file(file, fname);
             Subnode_t *S_newNode = malloc(sizeof(Subnode_t));
             if(S_newNode == NULL)
             {

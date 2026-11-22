@@ -14,5 +14,6 @@ int main(int argc, char *argv[])
     {
         return FAILURE;
     }
-    do_operation(file, arr);
+    do_operation(&file, arr);
+    return SUCCESS;
 }

@@ -13,6 +13,28 @@ int duplicate_file(char *argv, File_t *file)
     }
     return FAILURE;
 }
+
+int is_backupfile(char *argv)
+{
+    FILE *fptr = fopen(argv, "r");
+    if(fptr == NULL)
+        return FAILURE;
+
+    char start = fgetc(fptr);
+    fseek(fptr, -1, SEEK_END);
+    char end = fgetc(fptr);
+    if(end == '\n')
+    {
+        fseek(fptr, -2, SEEK_END);
+        end = fgetc(fptr);
+    }
+    fclose(fptr);
+    if(start == '#' && end == '#')
+    {
+        return SUCCESS;
+    }
+    return FAILURE;
+}
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
 
 int validate_arg(char *argv[], File_t **file)
@@ -48,6 +70,12 @@ int validate_arg(char *argv[], File_t **file)
         if(duplicate_file(argv[i], *file) == SUCCESS)
         {
             printf("ERROR... Duplicate file found : %s\n", argv[i]);
+            continue;
+        }
+
+        if(is_backupfile(argv[i]) == SUCCESS)
+        {
+            printf("ERROR... %s is a backup file we can not take it...\n", argv[i]);
             continue;
         }
         insert_at_last(file, argv[i]);
@@ -139,6 +167,7 @@ int insert_word(char *fname, char *word, Mainnode_t *arr[])
         if(M_newNode == NULL)
         {
             printf("Memory allocation for mainnode is failed\n");
+            free(S_newNode);
             return FAILURE;
         }
         strcpy(M_newNode -> word, word);
@@ -202,6 +231,7 @@ int insert_word(char *fname, char *word, Mainnode_t *arr[])
     if(M_newNode == NULL)
     {
         printf("Memory allocation for mainnode is failed\n");
+        free(S_newNode);
         return FAILURE;
     }
     strcpy(M_newNode -> word, word);
@@ -261,4 +291,29 @@ int valid_backupfile(char *filename)
     }
     fclose(fptr);
     return SUCCESS;
+}
+
+int remove_duplicate_file(File_t **file, char *filename)
+{
+    File_t *temp = *file;
+    File_t *prev = NULL;
+
+    while(temp != NULL)
+    {
+        if(strcmp(temp -> fname, filename) == 0)
+        {
+            if(prev == NULL)
+            {
+                *file = temp -> link;
+            }
+            else{
+                prev -> link = temp -> link;
+            }
+            free(temp);
+            return SUCCESS;
+        }
+        prev = temp;
+        temp = temp -> link;
+    }
+    return FAILURE;
 }
